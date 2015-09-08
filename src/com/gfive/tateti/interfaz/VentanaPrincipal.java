@@ -9,6 +9,10 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
 
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.fife.ui.rtextarea.RTextScrollPane;
+
 import com.gfive.tateti.componentes.arbol.ArbolArchivos;
 import com.gfive.tateti.exception.TatetiException;
 
@@ -51,11 +55,18 @@ public class VentanaPrincipal extends JFrame {
         setBounds(0, 0, 1024, 768);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setJMenuBar(new Menu());
-        setLayout(new MigLayout());
+        setLayout(new MigLayout("", "[grow][grow]", "[grow]"));
 
         Container pane = getContentPane();
+
         ArbolArchivos arbol = new ArbolArchivos();
         arbol.cargarNodos(RUTA_INICIAL);
-        pane.add(arbol);
+        pane.add(arbol, "growy, growx");
+
+        RSyntaxTextArea textArea = new RSyntaxTextArea(/*20, 60*/);
+        textArea.setEditable(false);
+        textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
+        RTextScrollPane scrollPane = new RTextScrollPane(textArea);
+        pane.add(scrollPane, "growx, growy, wrap");
     }
 }
