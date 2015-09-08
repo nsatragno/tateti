@@ -9,11 +9,8 @@ import javax.swing.JFrame;
 
 import net.miginfocom.swing.MigLayout;
 
-import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
-import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
-import org.fife.ui.rtextarea.RTextScrollPane;
-
 import com.gfive.tateti.componentes.arbol.ArbolArchivos;
+import com.gfive.tateti.componentes.visor.VisorCodigoFuente;
 
 /**
  * Ventana principal de la aplicación, conteniendo el panel de código y las métricas.
@@ -52,7 +49,7 @@ public class VentanaPrincipal extends JFrame {
         setBounds(0, 0, 1024, 768);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setJMenuBar(new Menu());
-        setLayout(new MigLayout("debug", "[][grow]", "[grow]"));
+        setLayout(new MigLayout("", "[][grow]", "[grow]"));
         //setLayout(new MigLayout("debug", "", ""));
 
         Container pane = getContentPane();
@@ -61,10 +58,6 @@ public class VentanaPrincipal extends JFrame {
         arbol.cargarNodos(RUTA_INICIAL);
         pane.add(arbol, "width 30%, growy");
 
-        RSyntaxTextArea textArea = new RSyntaxTextArea();
-        textArea.setEditable(false);
-        textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
-        RTextScrollPane scrollPane = new RTextScrollPane(textArea);
-        pane.add(scrollPane, "grow, wrap");
+        new VisorCodigoFuente(arbol).agregarAContenedor(pane, "grow, wrap");
     }
 }

@@ -5,6 +5,7 @@ import java.nio.file.Path;
 
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeSelectionModel;
 
 public class ArbolArchivos extends JTree {
 
@@ -14,16 +15,11 @@ public class ArbolArchivos extends JTree {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Mensaje que se muestra al usuario cuando la ruta pasada no es una carpeta en el sistema de
-     * archivos.
-     */
-    private static final String MENSAJE_RAIZ_NO_ES_CARPETA = "La ruta seleccionada no es una carpeta";
-
-    /**
      * Construye el árbol de archivos sin datos.
      */
     public ArbolArchivos() {
         super(new DefaultMutableTreeNode());
+        getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     }
 
     /**
@@ -38,8 +34,9 @@ public class ArbolArchivos extends JTree {
 
         llenarArbol(getRaiz(), archivoRaiz);
 
-        // Muestro la primera fila expandida para que el árbol no se vea todo colapsado.
-        expandRow(0);
+        // Muestro todas las filas expandidas.
+        for (int i = 0; i < getRowCount(); i++)
+            expandRow(i);
     }
 
     /**
