@@ -1,30 +1,38 @@
 package com.gfive.tateti.componentes.arbol;
 
-import java.io.File;
-import java.net.URI;
+import java.nio.file.Path;
+import java.util.Objects;
 
 /**
- * Archivo que se usa como dato para los nodos del árbol.
+ * Dato para los nodos del árbol de archivos.
  * @author nicolas
  *
  */
-public class ArchivoNodo extends File {
+public class ArchivoNodo {
 
     /**
-     * ID de serie por defecto.
+     * Path asociado al ArchivoNodo.
      */
-    private static final long serialVersionUID = 1L;
+    private Path path;
 
     /**
-     * Construye un ArchivoNodo por ruta.
+     * Construye un ArchivoNodo por path.
      * @param uri
      */
-    public ArchivoNodo(URI uri) {
-        super(uri);
+    public ArchivoNodo(Path path) {
+        Objects.requireNonNull(path);
+        this.path = path;
+    }
+    
+    /**
+     * @return la ruta asociada al ArchivoNodo.
+     */
+    public Path getPath() {
+        return path;
     }
 
     @Override
     public String toString() {
-        return getName();
+        return path.getFileName().toString();
     }
 }

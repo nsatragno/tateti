@@ -1,7 +1,6 @@
 package com.gfive.tateti.componentes.visor;
 
 import java.awt.Container;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Objects;
@@ -15,6 +14,7 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
 import com.gfive.tateti.componentes.arbol.ArbolArchivos;
+import com.gfive.tateti.componentes.arbol.ArchivoNodo;
 import com.gfive.tateti.log.Log;
 
 /**
@@ -74,11 +74,11 @@ public class VisorCodigoFuente extends RSyntaxTextArea implements TreeSelectionL
         if (nodo == null)
             return;
         
-        File archivo = (File)nodo.getUserObject();
+        ArchivoNodo archivo = (ArchivoNodo)nodo.getUserObject();
         
         try {
             Files
-                .lines(archivo.toPath())
+                .lines(archivo.getPath())
                 .forEach((linea) -> append(linea + "\n"));
         } catch (IOException e) {
             Log log = new Log();

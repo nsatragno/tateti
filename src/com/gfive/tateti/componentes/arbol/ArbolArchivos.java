@@ -1,6 +1,7 @@
 package com.gfive.tateti.componentes.arbol;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import javax.swing.JTree;
@@ -30,7 +31,7 @@ public class ArbolArchivos extends JTree {
      *            - la ruta donde se empieza a examinar el sistema de archivos.
      */
     public void cargarNodos(Path rutaInicial) {
-        ArchivoNodo archivoRaiz = new ArchivoNodo(rutaInicial.toUri());
+        ArchivoNodo archivoRaiz = new ArchivoNodo(rutaInicial);
 
         llenarArbol(getRaiz(), archivoRaiz);
 
@@ -51,11 +52,18 @@ public class ArbolArchivos extends JTree {
         DefaultMutableTreeNode nodo = new DefaultMutableTreeNode(archivoRaiz);
         raiz.add(nodo);
 
-        if (!archivoRaiz.isDirectory())
+        if (!Files.isDirectory(archivoRaiz.getPath()))
             return;
 
-        for (File hijo : archivoRaiz.listFiles(new FiltroCarpetas()))
-            llenarArbol(nodo, new ArchivoNodo(hijo.toURI()));
+        FiltroCarpetas filtro = new FiltroCarpetas();
+        try {
+            Files
+                .list(archivoRaiz.getPath())
+                .filter(hijo -> filtro.matches(hijo))
+                .forEach(hijo -> llenarArbol(nodo, new ArchivoNodo(hijo)));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
