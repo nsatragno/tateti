@@ -1,5 +1,5 @@
 # tateti
 
-## Tooling for Automated TEsting Integration
+## Tooling for Automated TEsTIng
 
 A simple code testing application project for University.
