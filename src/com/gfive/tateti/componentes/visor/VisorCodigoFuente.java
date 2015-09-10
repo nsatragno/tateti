@@ -14,7 +14,7 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
 import com.gfive.tateti.componentes.arbol.ArbolArchivos;
-import com.gfive.tateti.componentes.arbol.ArchivoNodo;
+import com.gfive.tateti.componentes.arbol.NodoArbol;
 import com.gfive.tateti.log.Log;
 
 /**
@@ -39,11 +39,15 @@ public class VisorCodigoFuente extends RSyntaxTextArea implements TreeSelectionL
      */
     private final ArbolArchivos arbol;
 
+    // TODO mover a otro lado.
+    private ModeloTablaMetricas modelo;
+
     /**
      * Construye un visor de código fuente asociado a un árbol de archivos dado.
      * @param arbol - el árbol al que el visor está relacionado. No puede ser null.
      */
-    public VisorCodigoFuente(ArbolArchivos arbol) {
+    public VisorCodigoFuente(ArbolArchivos arbol, ModeloTablaMetricas modelo) {
+        this.modelo = modelo;
         Objects.requireNonNull(arbol);
         this.arbol = arbol;
 
@@ -73,13 +77,18 @@ public class VisorCodigoFuente extends RSyntaxTextArea implements TreeSelectionL
         if (nodo == null)
             return;
         
-        ArchivoNodo archivo = (ArchivoNodo)nodo.getUserObject();
+        NodoArbol archivo = (NodoArbol)nodo.getUserObject();
         
         // Si seleccionó una carpeta, tampoco hay nada que hacer.
-        if (Files.isDirectory(archivo.getPath()))
+        if (archivo.esCarpeta())
             return;
         
+        // TODO mover a otro lado.
+        modelo.setMetricas(archivo.getMetricas());
+
+
         try {
+            setText("");
             Files
                 .lines(archivo.getPath())
                 .forEach((linea) -> append(linea + "\n"));

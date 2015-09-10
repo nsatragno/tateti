@@ -1,38 +1,49 @@
 package com.gfive.tateti.componentes.arbol;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import com.gfive.tateti.metricas.Metrica;
+import com.gfive.tateti.metricas.MetricasFactory;
 
 /**
  * Dato para los nodos del árbol de archivos.
  * @author nicolas
  *
  */
-public class ArchivoNodo {
-
-    /**
-     * Path asociado al ArchivoNodo.
-     */
-    private Path path;
-
-    /**
-     * Construye un ArchivoNodo por path.
-     * @param uri
-     */
-    public ArchivoNodo(Path path) {
-        Objects.requireNonNull(path);
-        this.path = path;
-    }
+public class ArchivoNodo extends NodoArbol {
     
     /**
-     * @return la ruta asociada al ArchivoNodo.
+     * Construye un ArchivoNodo por path.
+     * @param path - la ruta al archivo.
      */
-    public Path getPath() {
-        return path;
+    public ArchivoNodo(Path path) {
+        super(path);
     }
+    
+    
+    @Override
+    protected List<Metrica> calcularMetricas() {
+        // Cargo el archivo completo en memoria.
+        final List<String> lineasArchivo;
+        try {
+            lineasArchivo =  Files.lines(getPath()).collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        
+        return MetricasFactory.get()
+            .getMetricas()
+            .peek(metrica -> metrica.procesar(lineasArchivo))
+            .collect(Collectors.toList());
+    }
+    
 
     @Override
-    public String toString() {
-        return path.getFileName().toString();
+    public boolean esCarpeta() {
+        return false;
     }
 }

@@ -31,7 +31,7 @@ public class ArbolArchivos extends JTree {
      *            - la ruta donde se empieza a examinar el sistema de archivos.
      */
     public void cargarNodos(Path rutaInicial) {
-        ArchivoNodo archivoRaiz = new ArchivoNodo(rutaInicial);
+        NodoArbol archivoRaiz = NodoArbol.construir(rutaInicial);
 
         llenarArbol(getRaiz(), archivoRaiz);
 
@@ -41,26 +41,27 @@ public class ArbolArchivos extends JTree {
     }
 
     /**
-     * Recorre el sistema de archivos, buscando carpetas para agregar al árbol.
+     * Recorre el sistema de archivos, buscando archivos .java y carpetas para agregar al árbol.
      * 
      * @param raiz
      *            - nodo raíz del árbol.
      * @param archivoRaiz
      *            - archivo del que se parte para llenar.
      */
-    private void llenarArbol(DefaultMutableTreeNode raiz, ArchivoNodo archivoRaiz) {
+    private void llenarArbol(DefaultMutableTreeNode raiz, NodoArbol archivoRaiz) {
         DefaultMutableTreeNode nodo = new DefaultMutableTreeNode(archivoRaiz);
         raiz.add(nodo);
 
-        if (!Files.isDirectory(archivoRaiz.getPath()))
+        if (!archivoRaiz.esCarpeta())
             return;
 
         FiltroCarpetas filtro = new FiltroCarpetas();
         try {
             Files
                 .list(archivoRaiz.getPath())
+                .parallel()
                 .filter(hijo -> filtro.matches(hijo))
-                .forEach(hijo -> llenarArbol(nodo, new ArchivoNodo(hijo)));
+                .forEach(hijo -> llenarArbol(nodo, NodoArbol.construir(hijo)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
