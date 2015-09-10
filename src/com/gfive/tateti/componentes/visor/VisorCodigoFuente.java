@@ -68,13 +68,16 @@ public class VisorCodigoFuente extends RSyntaxTextArea implements TreeSelectionL
     public void valueChanged(TreeSelectionEvent evento) {
         // La selección del árbol cambió. Buscamos cuál es el nuevo elemento seleccionado.
         DefaultMutableTreeNode nodo = (DefaultMutableTreeNode) arbol.getLastSelectedPathComponent();
-        setText("");
 
         // Si la nueva selección está vacía, no hay nada que hacer.
         if (nodo == null)
             return;
         
         ArchivoNodo archivo = (ArchivoNodo)nodo.getUserObject();
+        
+        // Si seleccionó una carpeta, tampoco hay nada que hacer.
+        if (Files.isDirectory(archivo.getPath()))
+            return;
         
         try {
             Files
