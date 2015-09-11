@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import java.nio.file.Path;
 
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 import net.miginfocom.swing.MigLayout;
@@ -58,7 +59,7 @@ public class VentanaPrincipal extends JFrame implements AbreArchivo {
         Container pane = getContentPane();
 
         arbol = new ArbolArchivos();
-        pane.add(arbol, "grow");
+        pane.add(new JScrollPane(arbol), "grow");
         
         ModeloTablaMetricas modelo = new ModeloTablaMetricas();
 
