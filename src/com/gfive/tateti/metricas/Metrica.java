@@ -19,6 +19,14 @@ public interface Metrica {
     public void procesar(List<String> lineasArchivo) throws RuntimeException;
     
     /**
+     * Devuelve una nueva métrica que es el resultado de agregar esta métrica a la métrica pasada
+     * por parámetro.
+     * 
+     * @param metrica - la métrica con la que esta debe agregarse.
+     */
+    public Metrica agregar(Metrica metrica);
+    
+    /**
      * @return el nombre amigable para el usuario de la métrica.
      */
     public String getNombre();

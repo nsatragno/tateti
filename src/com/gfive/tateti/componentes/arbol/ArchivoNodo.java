@@ -32,7 +32,7 @@ public class ArchivoNodo extends NodoArbol {
     
     
     @Override
-    protected List<Metrica> calcularMetricas() {
+    public List<Metrica> calcularMetricas() {
         // Cargo el archivo completo en memoria.
         final List<String> lineasArchivo;
         try {

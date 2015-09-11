@@ -76,12 +76,12 @@ public class VisorCodigoFuente extends RSyntaxTextArea implements TreeSelectionL
         if (nodo == null)
             return;
         
+        // TODO mover el modelo a otro lado.
+        modelo.setMetricas(nodo.calcularMetricas());
+        
         // Si seleccionó una carpeta, tampoco hay nada que hacer.
         if (nodo.esCarpeta())
             return;
-        
-        // TODO mover a otro lado.
-        modelo.setMetricas(nodo.getMetricas());
 
         try {
             setText("");

@@ -27,11 +27,6 @@ public abstract class NodoArbol extends DefaultMutableTreeNode {
     private final Path path;
 
     /**
-     * Resultados del procesamiento de métricas.
-     */
-    private final List<Metrica> metricas;
-
-    /**
      * Construye una instancia específica de NodoArbol de acuerdo al path dado.
      * @param path
      * @return
@@ -49,7 +44,6 @@ public abstract class NodoArbol extends DefaultMutableTreeNode {
     protected NodoArbol(Path path) {
         Objects.requireNonNull(path);
         this.path = path;
-        metricas = calcularMetricas();
     }
     
     /**
@@ -57,13 +51,6 @@ public abstract class NodoArbol extends DefaultMutableTreeNode {
      */
     public Path getRutaArchivo() {
         return path;
-    }
-
-    /**
-     * @return las métricas del nodo.
-     */
-    public List<Metrica> getMetricas() {
-        return metricas;
     }
 
     @Override
@@ -79,5 +66,5 @@ public abstract class NodoArbol extends DefaultMutableTreeNode {
     /**
      * @return el listado de métricas completo y calculado del archivo.
      */
-    protected abstract List<Metrica> calcularMetricas();
+    public abstract List<Metrica> calcularMetricas();
 }
