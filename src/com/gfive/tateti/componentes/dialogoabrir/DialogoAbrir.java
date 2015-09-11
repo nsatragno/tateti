@@ -9,7 +9,7 @@ import javax.swing.JFileChooser;
  * @author nicolas
  *
  */
-public class DialogoAbrirCarpeta extends JFileChooser {
+public class DialogoAbrir extends JFileChooser {
     
     /**
      * Construye y muestra el diálogo de abrir carpeta. Si se elige abrir un archivo, notifica
@@ -17,10 +17,12 @@ public class DialogoAbrirCarpeta extends JFileChooser {
      * 
      * @param padre - contenedor del diálogo.
      * @param abreArchivo - objeto que es notificado cuando se abre un archivo.
+     * @param modo - el modo del selector de archivos. Una constante de JFileChooser.
+     *               @see setFileSelectionMode
      */
-    public DialogoAbrirCarpeta(Component padre, AbreArchivo abreArchivo) {
+    public DialogoAbrir(Component padre, AbreArchivo abreArchivo, int modo) {
         super();
-        setFileSelectionMode(DIRECTORIES_ONLY);
+        setFileSelectionMode(modo);
         if (showOpenDialog(padre) == APPROVE_OPTION)
             abreArchivo.abrirArchivo(getSelectedFile().toPath());
     }

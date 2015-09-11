@@ -1,11 +1,12 @@
 package com.gfive.tateti.interfaz;
 
+import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 import com.gfive.tateti.componentes.dialogoabrir.AbreArchivo;
-import com.gfive.tateti.componentes.dialogoabrir.DialogoAbrirCarpeta;
+import com.gfive.tateti.componentes.dialogoabrir.DialogoAbrir;
 
 /**
  * Barra de menú mostrada en la parte superior derecha de la pantalla.
@@ -25,16 +26,18 @@ public class Menu extends JMenuBar {
         JMenu archivo = new JMenu("Archivo");
         add(archivo);
 
-        JMenuItem abrir = new JMenuItem("Abrir...");
-        abrir.addActionListener((action) -> System.out.println("Abriendo"));
-        archivo.add(abrir);
+        JMenuItem abrirArchivo = new JMenuItem("Abrir...");
+        abrirArchivo.addActionListener(
+                accion -> new DialogoAbrir(this, abreArchivo, JFileChooser.FILES_ONLY));
+        archivo.add(abrirArchivo);
 
         JMenuItem abrirCarpeta = new JMenuItem("Abrir carpeta...");
-        abrirCarpeta.addActionListener(accion -> new DialogoAbrirCarpeta(this, abreArchivo));
+        abrirCarpeta.addActionListener(
+                accion -> new DialogoAbrir(this, abreArchivo, JFileChooser.DIRECTORIES_ONLY));
         archivo.add(abrirCarpeta);
 
         JMenuItem salir = new JMenuItem("Salir");
-        salir.addActionListener((action) -> System.out.println("Saliendo"));
+        salir.addActionListener((action) -> System.exit(1));
         archivo.add(salir);
     }
 }
