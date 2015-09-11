@@ -1,11 +1,13 @@
 package com.gfive.tateti.componentes.arbol;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.gfive.tateti.log.Log;
 import com.gfive.tateti.metricas.Metrica;
 import com.gfive.tateti.metricas.MetricasFactory;
 
@@ -36,8 +38,11 @@ public class ArchivoNodo extends NodoArbol {
         // Cargo el archivo completo en memoria.
         final List<String> lineasArchivo;
         try {
-            lineasArchivo =  Files.lines(getRutaArchivo()).collect(Collectors.toList());
+            lineasArchivo =  Files.readAllLines(getRutaArchivo(), StandardCharsets.ISO_8859_1);
         } catch (IOException e) {
+            Log log = new Log();
+            log.error("Error al intentar calcular las métricas de " + getRutaArchivo());
+            log.reportarError(e);
             throw new RuntimeException(e);
         }
         

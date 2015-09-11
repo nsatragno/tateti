@@ -3,7 +3,6 @@ package com.gfive.tateti.interfaz;
 import java.awt.Container;
 import java.awt.EventQueue;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javax.swing.JFrame;
 import javax.swing.JTable;
@@ -11,6 +10,7 @@ import javax.swing.JTable;
 import net.miginfocom.swing.MigLayout;
 
 import com.gfive.tateti.componentes.arbol.ArbolArchivos;
+import com.gfive.tateti.componentes.dialogoabrir.AbreArchivo;
 import com.gfive.tateti.componentes.visor.ModeloTablaMetricas;
 import com.gfive.tateti.componentes.visor.VisorCodigoFuente;
 
@@ -20,7 +20,7 @@ import com.gfive.tateti.componentes.visor.VisorCodigoFuente;
  * @author nicolas
  *
  */
-public class VentanaPrincipal extends JFrame {
+public class VentanaPrincipal extends JFrame implements AbreArchivo {
 
     /**
      * ID de serie por defecto.
@@ -33,10 +33,10 @@ public class VentanaPrincipal extends JFrame {
     private static final String NOMBRE_APLICACION = "tateti";
 
     /**
-     * Ruta inicial en la que se buscan los archivos.
-     * TODO permitir elegir al usuario.
+     * Árbol que muestra todos los archivos y subcarpetas de la carpeta seleccionada para trabajar
+     * en la aplicación.
      */
-    private static final Path RUTA_INICIAL = Paths.get("/home/nicolas/Desarrollo/grafos");
+    private ArbolArchivos arbol;
     
     /**
      * Arranca la aplicación.
@@ -52,12 +52,12 @@ public class VentanaPrincipal extends JFrame {
         setTitle(NOMBRE_APLICACION);
         setBounds(0, 0, 1024, 768);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setJMenuBar(new Menu());
+        setJMenuBar(new Menu(this));
         setLayout(new MigLayout("", "[30%][70%]", "[80%][20%]"));
 
         Container pane = getContentPane();
 
-        ArbolArchivos arbol = new ArbolArchivos();
+        arbol = new ArbolArchivos();
         pane.add(arbol, "grow");
         
         ModeloTablaMetricas modelo = new ModeloTablaMetricas();
@@ -66,8 +66,11 @@ public class VentanaPrincipal extends JFrame {
         
         pane.add(new JTable(modelo), "span 2, grow, wrap");
 
-        EventQueue.invokeLater(() -> arbol.cargarNodos(RUTA_INICIAL));
-
         setVisible(true);
+    }
+
+    @Override
+    public void abrirArchivo(Path archivo) {
+        EventQueue.invokeLater(() -> arbol.cargarNodos(archivo));
     }
 }

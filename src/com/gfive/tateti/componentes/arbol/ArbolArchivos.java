@@ -21,6 +21,7 @@ public class ArbolArchivos extends JTree {
     public ArbolArchivos() {
         super(new DefaultMutableTreeNode());
         getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        setRootVisible(false);
     }
 
     /**
@@ -31,7 +32,12 @@ public class ArbolArchivos extends JTree {
      *            - la ruta donde se empieza a examinar el sistema de archivos.
      */
     public void cargarNodos(Path rutaInicial) {
+        // Cambiar el setRootVisible es un workaround para un bug de swing.
+        setRootVisible(true);
+        getRaiz().removeAllChildren();
         llenarArbol(getRaiz(), rutaInicial);
+        
+        updateUI();
 
         // Muestro todas las filas expandidas.
         for (int i = 0; i < getRowCount(); i++)

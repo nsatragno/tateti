@@ -2,6 +2,7 @@ package com.gfive.tateti.componentes.visor;
 
 import java.awt.Container;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Objects;
 
@@ -86,7 +87,7 @@ public class VisorCodigoFuente extends RSyntaxTextArea implements TreeSelectionL
         try {
             setText("");
             Files
-                .lines(nodo.getRutaArchivo())
+                .lines(nodo.getRutaArchivo(), StandardCharsets.ISO_8859_1)
                 .forEach((linea) -> append(linea + "\n"));
         } catch (IOException e) {
             Log log = new Log();
