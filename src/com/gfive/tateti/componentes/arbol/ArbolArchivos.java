@@ -31,37 +31,38 @@ public class ArbolArchivos extends JTree {
      *            - la ruta donde se empieza a examinar el sistema de archivos.
      */
     public void cargarNodos(Path rutaInicial) {
-        NodoArbol archivoRaiz = NodoArbol.construir(rutaInicial);
-
-        llenarArbol(getRaiz(), archivoRaiz);
+        llenarArbol(getRaiz(), rutaInicial);
 
         // Muestro todas las filas expandidas.
         for (int i = 0; i < getRowCount(); i++)
             expandRow(i);
+
+        setRootVisible(false);
     }
 
     /**
-     * Recorre el sistema de archivos, buscando archivos .java y carpetas para agregar al árbol.
+     * Recorre el sistema de archivos, buscando archivos .java y carpetas para agregar al árbol,
+     * hijos de la ruta pasada.
      * 
-     * @param raiz
-     *            - nodo raíz del árbol.
-     * @param archivoRaiz
-     *            - archivo del que se parte para llenar.
+     * @param predecesor
+     *            - nodo padre del subárbol que se creará.
+     * @param rutaNueva
+     *            - archivo del que se parte para llenar el árbol.
      */
-    private void llenarArbol(DefaultMutableTreeNode raiz, NodoArbol archivoRaiz) {
-        DefaultMutableTreeNode nodo = new DefaultMutableTreeNode(archivoRaiz);
-        raiz.add(nodo);
+    private void llenarArbol(DefaultMutableTreeNode predecesor, Path rutaNueva) {
+        NodoArbol nodo = NodoArbol.construir(rutaNueva);
+        predecesor.add(nodo);
 
-        if (!archivoRaiz.esCarpeta())
+        if (!nodo.esCarpeta())
             return;
 
         FiltroCarpetas filtro = new FiltroCarpetas();
         try {
             Files
-                .list(archivoRaiz.getPath())
+                .list(nodo.getRutaArchivo())
                 .parallel()
                 .filter(hijo -> filtro.matches(hijo))
-                .forEach(hijo -> llenarArbol(nodo, NodoArbol.construir(hijo)));
+                .forEach(hijo -> llenarArbol(nodo, hijo));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -72,5 +73,10 @@ public class ArbolArchivos extends JTree {
      */
     public DefaultMutableTreeNode getRaiz() {
         return (DefaultMutableTreeNode) getModel().getRoot();
+    }
+    
+    @Override
+    public NodoArbol getLastSelectedPathComponent() {
+        return (NodoArbol) super.getLastSelectedPathComponent();
     }
 }

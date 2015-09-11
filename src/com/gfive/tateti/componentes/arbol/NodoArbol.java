@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import com.gfive.tateti.metricas.Metrica;
 
 /**
@@ -12,8 +14,13 @@ import com.gfive.tateti.metricas.Metrica;
  * @author nicolas
  *
  */
-public abstract class NodoArbol {
+public abstract class NodoArbol extends DefaultMutableTreeNode {
     
+    /**
+     * ID de serie por defecto.
+     */
+    private static final long serialVersionUID = 1L;
+
     /**
      * Path asociado al NodoArbol.
      */
@@ -31,7 +38,7 @@ public abstract class NodoArbol {
      */
     public static NodoArbol construir(Path path) {
         if (Files.isDirectory(path))
-            return new CarpetaNodo(path);
+            return new NodoCarpeta(path);
         return new ArchivoNodo(path);
     }
 
@@ -48,7 +55,7 @@ public abstract class NodoArbol {
     /**
      * @return la ruta del archivo.
      */
-    public Path getPath() {
+    public Path getRutaArchivo() {
         return path;
     }
 

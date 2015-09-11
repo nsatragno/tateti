@@ -7,7 +7,6 @@ import java.util.Objects;
 
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
@@ -71,26 +70,23 @@ public class VisorCodigoFuente extends RSyntaxTextArea implements TreeSelectionL
     @Override
     public void valueChanged(TreeSelectionEvent evento) {
         // La selección del árbol cambió. Buscamos cuál es el nuevo elemento seleccionado.
-        DefaultMutableTreeNode nodo = (DefaultMutableTreeNode) arbol.getLastSelectedPathComponent();
+        NodoArbol nodo = arbol.getLastSelectedPathComponent();
 
         // Si la nueva selección está vacía, no hay nada que hacer.
         if (nodo == null)
             return;
         
-        NodoArbol archivo = (NodoArbol)nodo.getUserObject();
-        
         // Si seleccionó una carpeta, tampoco hay nada que hacer.
-        if (archivo.esCarpeta())
+        if (nodo.esCarpeta())
             return;
         
         // TODO mover a otro lado.
-        modelo.setMetricas(archivo.getMetricas());
-
+        modelo.setMetricas(nodo.getMetricas());
 
         try {
             setText("");
             Files
-                .lines(archivo.getPath())
+                .lines(nodo.getRutaArchivo())
                 .forEach((linea) -> append(linea + "\n"));
         } catch (IOException e) {
             Log log = new Log();

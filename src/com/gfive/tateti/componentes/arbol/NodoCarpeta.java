@@ -11,9 +11,18 @@ import com.gfive.tateti.metricas.Metrica;
  * @author nicolas
  *
  */
-public class CarpetaNodo extends NodoArbol {
+public class NodoCarpeta extends NodoArbol {
 
-    protected CarpetaNodo(Path path) {
+    /**
+     * ID de serie por defecto.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Construye un NodoCarpeta.
+     * @param path
+     */
+    protected NodoCarpeta(Path path) {
         super(path);
     }
 

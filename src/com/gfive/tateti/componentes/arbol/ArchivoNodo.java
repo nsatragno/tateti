@@ -17,6 +17,12 @@ import com.gfive.tateti.metricas.MetricasFactory;
 public class ArchivoNodo extends NodoArbol {
     
     /**
+     * ID de serie por defecto.
+     */
+    private static final long serialVersionUID = 1L;
+
+
+    /**
      * Construye un ArchivoNodo por path.
      * @param path - la ruta al archivo.
      */
@@ -30,7 +36,7 @@ public class ArchivoNodo extends NodoArbol {
         // Cargo el archivo completo en memoria.
         final List<String> lineasArchivo;
         try {
-            lineasArchivo =  Files.lines(getPath()).collect(Collectors.toList());
+            lineasArchivo =  Files.lines(getRutaArchivo()).collect(Collectors.toList());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
