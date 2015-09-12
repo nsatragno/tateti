@@ -1,12 +1,13 @@
 package com.gfive.tateti.componentes.arbol;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
+import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
@@ -74,11 +75,10 @@ public class ArbolArchivos extends JTree {
             return false;
         }
 
-        try {
-            // Recorremos todos los hijos, llamando recursivamente a esta función. Si alguno
-            // se agrega, agregamos a este archivo también.
-            boolean marcada =  Files.list(archivo)
-                 .parallel()
+        // Recorremos todos los hijos, llamando recursivamente a esta función. Si alguno
+        // se agrega, agregamos a este archivo también.
+        try (Stream<Path> stream = Files.list(archivo)) {
+             boolean marcada = stream
                  .map((hijo) -> marcarArchivosParaCargar(hijo, conjunto))
                  // La reducción se asegura que, con que uno devuelva true, el resultado sea true.
                  // Evitamos usar anyMatch() para asegurarnos que se recorran todos los elementos
@@ -88,7 +88,8 @@ public class ArbolArchivos extends JTree {
                 conjunto.put(archivo, archivo);
             return marcada;
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
         }
     }
 

@@ -38,6 +38,7 @@ public class VentanaPrincipal extends JFrame implements AbreArchivo {
      * en la aplicación.
      */
     private ArbolArchivos arbol;
+private VisorCodigoFuente visor;
     
     /**
      * Arranca la aplicación.
@@ -63,7 +64,8 @@ public class VentanaPrincipal extends JFrame implements AbreArchivo {
         
         ModeloTablaMetricas modelo = new ModeloTablaMetricas();
 
-        new VisorCodigoFuente(arbol, modelo).agregarAContenedor(pane, "grow, wrap");
+        visor = new VisorCodigoFuente(arbol, modelo);
+        visor.agregarAContenedor(pane, "grow, wrap");
         
         pane.add(new JTable(modelo), "span 2, grow, wrap");
 
@@ -72,6 +74,9 @@ public class VentanaPrincipal extends JFrame implements AbreArchivo {
 
     @Override
     public void abrirArchivo(Path archivo) {
-        EventQueue.invokeLater(() -> arbol.cargarNodos(archivo));
+        EventQueue.invokeLater(() -> {
+            visor.setText("");
+            arbol.cargarNodos(archivo);
+        });
     }
 }
