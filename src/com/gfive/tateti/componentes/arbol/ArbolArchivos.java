@@ -1,8 +1,11 @@
 package com.gfive.tateti.componentes.arbol;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -35,7 +38,11 @@ public class ArbolArchivos extends JTree {
         // Cambiar el setRootVisible es un workaround para un bug de swing.
         setRootVisible(true);
         getRaiz().removeAllChildren();
-        llenarArbol(getRaiz(), rutaInicial);
+        
+        Map<Path, Path> archivosQueLlenar = new ConcurrentHashMap<Path, Path>();
+        marcarArchivosParaCargar(rutaInicial, archivosQueLlenar);
+
+        llenarArbol(getRaiz(), rutaInicial, archivosQueLlenar);
         
         updateUI();
 
@@ -44,6 +51,35 @@ public class ArbolArchivos extends JTree {
             expandRow(i);
 
         setRootVisible(false);
+    }
+    
+    /**
+     * Actualiza el conjunto de todos los archivos que deberían cargarse en el árbol de la
+     * aplicación.
+     * 
+     * @param archivo
+     * @param conjunto
+     */
+    private boolean marcarArchivosParaCargar(Path archivo, Map<Path, Path> conjunto) {
+        if (Files.isRegularFile(archivo) &&
+            archivo.getFileName().toString().toLowerCase().endsWith(".java")) {
+            conjunto.put(archivo, archivo);
+            return true;
+        }
+        if (!Files.isDirectory(archivo))
+            return false;
+
+        try {
+            boolean marcada =  Files.list(archivo)
+                 .parallel()
+                 .map((hijo) -> marcarArchivosParaCargar(hijo, conjunto))
+                 .reduce(false, (r1, r2) -> r1 == true || r2 == true);
+            if (marcada)
+                conjunto.put(archivo, archivo);
+            return marcada;
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     /**
@@ -54,21 +90,23 @@ public class ArbolArchivos extends JTree {
      *            - nodo padre del subárbol que se creará.
      * @param rutaNueva
      *            - archivo del que se parte para llenar el árbol.
+     * @param archivosQueLlenar 
      */
-    private void llenarArbol(DefaultMutableTreeNode predecesor, Path rutaNueva) {
+    private void llenarArbol(DefaultMutableTreeNode predecesor,
+                             Path rutaNueva,
+                             Map<Path, Path> archivosQueLlenar) {
         NodoArbol nodo = NodoArbol.construir(rutaNueva);
         predecesor.add(nodo);
 
         if (!nodo.esCarpeta())
             return;
 
-        FiltroCarpetas filtro = new FiltroCarpetas();
         try {
             Files
                 .list(nodo.getRutaArchivo())
                 .parallel()
-                .filter(hijo -> filtro.matches(hijo))
-                .forEach(hijo -> llenarArbol(nodo, hijo));
+                .filter(hijo -> archivosQueLlenar.containsKey(hijo))
+                .forEach(hijo -> llenarArbol(nodo, hijo, archivosQueLlenar));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
