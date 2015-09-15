@@ -34,7 +34,8 @@ public final class MetricasFactory {
      */
     public Stream<Metrica> getMetricas() {
         return Arrays.stream(new Metrica[] {
-            new CantidadLineas()
+            new CantidadLineas(),
+            new CantidadComentarios()
         });
     }
 }
