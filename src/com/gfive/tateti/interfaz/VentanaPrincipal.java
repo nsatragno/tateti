@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import java.nio.file.Path;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
@@ -14,14 +15,14 @@ import com.gfive.tateti.componentes.arbol.ArbolArchivos;
 import com.gfive.tateti.componentes.dialogoabrir.AbreArchivo;
 import com.gfive.tateti.componentes.visor.ModeloTablaMetricas;
 import com.gfive.tateti.componentes.visor.VisorCodigoFuente;
-
+import com.gfive.tateti.estructuras.HashSetObservable;
 /**
  * Ventana principal de la aplicación, conteniendo el panel de código y las métricas.
  * 
  * @author nicolas
  *
  */
-public class VentanaPrincipal extends JFrame implements AbreArchivo {
+public class VentanaPrincipal extends JFrame implements AbreArchivo, HashSetObservable.Observador {
 
     /**
      * ID de serie por defecto.
@@ -38,7 +39,21 @@ public class VentanaPrincipal extends JFrame implements AbreArchivo {
      * en la aplicación.
      */
     private ArbolArchivos arbol;
-private VisorCodigoFuente visor;
+    
+    /**
+     * El textarea con resaltado de sintaxis que muestra el código fuente.
+     */
+    private VisorCodigoFuente visor;
+
+    /**
+     * Etiqueta que indica el progreso al cargar un árbol de archivos.
+     */
+    private JLabel labelProgreso;
+    
+    /**
+     * La cantidad de objetos que han sido cargados en el árbol.
+     */
+    private int objetosArbol;
     
     /**
      * Arranca la aplicación.
@@ -68,15 +83,26 @@ private VisorCodigoFuente visor;
         visor.agregarAContenedor(pane, "grow, wrap");
         
         pane.add(new JTable(modelo), "span 2, grow, wrap");
+        
+        labelProgreso = new JLabel();
+        pane.add(labelProgreso);
 
         setVisible(true);
     }
 
     @Override
     public void abrirArchivo(Path archivo) {
-        EventQueue.invokeLater(() -> {
-            visor.setText("");
-            arbol.cargarNodos(archivo);
-        });
+        EventQueue.invokeLater(() -> visor.setText(""));
+        EventQueue.invokeLater(() -> labelProgreso.setText("Cargando..."));
+        objetosArbol = 0;
+        new Thread(() -> arbol.cargarNodos(archivo, this)).start();
+    }
+
+    @Override
+    public void objetoAgregado() {
+        objetosArbol++;
+        EventQueue.invokeLater(() ->
+            labelProgreso.setText(
+                    objetosArbol + " archivo" + (objetosArbol > 1 ? "s" : "") + " cargados"));
     }
 }

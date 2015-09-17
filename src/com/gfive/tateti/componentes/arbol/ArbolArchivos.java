@@ -1,16 +1,18 @@
 package com.gfive.tateti.componentes.arbol;
 
+import java.awt.EventQueue;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
+
+import com.gfive.tateti.estructuras.HashSetObservable;
 
 public class ArbolArchivos extends JTree {
 
@@ -34,24 +36,22 @@ public class ArbolArchivos extends JTree {
      * 
      * @param rutaInicial
      *            - la ruta donde se empieza a examinar el sistema de archivos.
+     * @param observador
+     *            - objeto al que se le notifican las inserciones de archivos.
      */
-    public void cargarNodos(Path rutaInicial) {
+    public void cargarNodos(Path rutaInicial, HashSetObservable.Observador observador) {
         // Cambiar el setRootVisible es un workaround para un bug de swing.
-        setRootVisible(true);
+        EventQueue.invokeLater(() -> setRootVisible(true)); 
+
         getRaiz().removeAllChildren();
         
-        ConcurrentHashMap<Path, Path> archivosQueLlenar = new ConcurrentHashMap<Path, Path>();
+        HashSetObservable<Path> archivosQueLlenar = new HashSetObservable<Path>(observador);
         marcarArchivosParaCargar(rutaInicial, archivosQueLlenar);
-
         llenarArbol(getRaiz(), rutaInicial, archivosQueLlenar);
         
-        updateUI();
-
-        // Muestro todas las filas expandidas.
-        for (int i = 0; i < getRowCount(); i++)
-            expandRow(i);
-
-        setRootVisible(false);
+        EventQueue.invokeLater(() -> updateUI()); 
+        EventQueue.invokeLater(() -> { for (int i = 0; i < getRowCount(); i++) expandRow(i); }); 
+        EventQueue.invokeLater(() -> setRootVisible(false)); 
     }
     
     /**
@@ -63,11 +63,11 @@ public class ArbolArchivos extends JTree {
      *                   en el árbol.
      * @return true si agregó el archivo pasado al árbol, false de lo contrario.
      */
-    private boolean marcarArchivosParaCargar(Path archivo, ConcurrentHashMap<Path, Path> conjunto) {
+    private boolean marcarArchivosParaCargar(Path archivo, HashSetObservable<Path> conjunto) {
         if (Files.isRegularFile(archivo) &&
             archivo.getFileName().toString().toLowerCase().endsWith(".java")) {
             // Si es un archivo normal y .java, lo agregamos al conjunto y ya terminamos.
-            conjunto.put(archivo, archivo);
+            conjunto.put(archivo);
             return true;
         }
         if (!Files.isDirectory(archivo)) {
@@ -79,13 +79,14 @@ public class ArbolArchivos extends JTree {
         // se agrega, agregamos a este archivo también.
         try (Stream<Path> stream = Files.list(archivo)) {
              boolean marcada = stream
+                 .parallel()
                  .map((hijo) -> marcarArchivosParaCargar(hijo, conjunto))
                  // La reducción se asegura que, con que uno devuelva true, el resultado sea true.
                  // Evitamos usar anyMatch() para asegurarnos que se recorran todos los elementos
                  // del stream.
                  .reduce(false, (r1, r2) -> r1 == true || r2 == true);
             if (marcada)
-                conjunto.put(archivo, archivo);
+                conjunto.put(archivo);
             return marcada;
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
